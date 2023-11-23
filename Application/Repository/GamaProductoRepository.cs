@@ -1,0 +1,27 @@
+using Domain.Entities;
+using Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
+
+namespace Application.Repository;
+public class GamaProductoRepository: GenericRepo<GamaProducto>, IGamaProducto
+{
+        private readonly ApiContext _context;
+    
+    public GamaProductoRepository(ApiContext context) : base(context)
+    {
+        _context = context;
+    }
+    public override async Task<IEnumerable<GamaProducto>> GetAllAsync()
+    {
+        return await _context.GamaProductos
+            .ToListAsync();
+    }
+
+    public async Task<GamaProducto> GetByIdAsync(string id)
+    {
+        return await _context.GamaProductos
+        .FirstOrDefaultAsync(p =>  p.Gama == id);
+    }
+
+}
