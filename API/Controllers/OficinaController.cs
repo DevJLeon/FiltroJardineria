@@ -84,4 +84,13 @@ public class OficinaController : BaseApiController
         await unitofwork.SaveAsync();
         return NoContent();
     }
+    [HttpGet("OficinasSinRepresentantesVenta")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<object>> OficinasSinRepresentantesVenta()
+    {
+        var entidad = await unitofwork.Oficinas.OficinasSinRepresentantesVenta();
+        var dto = mapper.Map<IEnumerable<object>>(entidad);
+        return Ok(dto);
+    }
 }

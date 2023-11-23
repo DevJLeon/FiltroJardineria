@@ -24,9 +24,11 @@ Task<IEnumerable<object>> EmpleadosNoRepresentante()
 
 7. Devuelve el nombre del producto del que se han vendido más unidades (Tenga en cuenta que tendrá que calcular cuál es el número total de unidades que se han vendido de cada producto a partir de los datos de la tabla detalle_pedido)
 
+Task<object> ProductoMasVendido()
+
 8. Devuelve un listado de los 20 productos más vendidos y el número total de unidades que se han vendido de cada uno. El listado deberá estar ordenado por el número total de unidades vendidas.
 
-Task<object> ProductoMasVendido()
+Task<IEnumerable<object>> VenteMasVendidos()
 
 9. Devuelve el nombre de los clientes a los que no se les ha entregado a tiempo un pedido
 

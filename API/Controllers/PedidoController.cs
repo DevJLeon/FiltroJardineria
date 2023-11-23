@@ -82,4 +82,13 @@ public class PedidoController : BaseApiController
         await unitofwork.SaveAsync();
         return NoContent();
     }
+    [HttpGet("PedidosRetrasados")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<object>> PedidosRetrasados()
+    {
+        var entidad = await unitofwork.Pedidos.PedidosRetrasados();
+        var dto = mapper.Map<IEnumerable<object>>(entidad);
+        return Ok(dto);
+    }
 }

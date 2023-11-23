@@ -74,4 +74,22 @@ public class ProductoRepository: GenericRepo<Producto>, IProducto
         return dato;
     }
 
+    public async Task<IEnumerable<object>> VenteMasVendidos()
+    {
+        var data = await (
+            from detallePedido in _context.DetallePedidos
+            group detallePedido by detallePedido.CodigoProducto into grp
+            join producto in _context.Productos on grp.Key equals producto.CodigoProducto
+            orderby grp.Sum(dp => dp.Cantidad) descending
+            select new
+            {
+                NombreProducto = producto.Nombre,
+                Codigo = grp.Key,
+                TotalUnidadesVendidas = grp.Sum(dp => dp.Cantidad)
+            }
+        ).Take(20).ToListAsync();
+    
+        return data;
+    }
+
 }
