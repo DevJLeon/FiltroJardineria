@@ -17,6 +17,7 @@
         return dato;
     }
 ```
+**Se realiza llama la tabla Cliente, y se realiza el filtro de los pedidos en "_context.Pedidos" cuyo códigoCliente es igual a el CodigoCliente de la tabla Cliente. Y con .Count se realiza el conteo de cuántas similitudes se han encontrado en el filtro para ser almacenadas en "Pedidos Realizados"**
 
 2. devuelve un listado con el codigo de pedido, codigo de cliente, fecha esperada y fecha de entrega de los pedidos que no han sido entregados a tiempo
 `http://localhost:5184/api/pedido/PedidosRetrasados`
@@ -42,6 +43,7 @@
         return dato;
     }
 ```
+**Se busca las entradas de la tabla pedidos, y se realiza el filtro con un JOIN a la tabla Clientes, donde corresponda el CodigoCliente, se realiza el filtro con el estado de "pendiente" en pedido y que la fecha de entrega sea mayor que la esperada, es decir, que no ha cumplido con la fecha esperada.**
 
 3. Devuelve un listado de los productos que nunca han aparecido en un pedido. El resultado debe mostrar el nombre, la descripción y la imagen del producto.
 `http://localhost:5184/api/producto/ProductosSinPedir`
@@ -64,6 +66,7 @@
         return data;
     }
 ```
+**Buscando en productos, se hace un JOIN que trae los correspondientes en DetallePedido. se realiza una subconsulta y se le pide que solo traiga aquellos que no tengan entradas en pedidos.**
 
 4. Devuelve las oficinas donde no trabaja ninguno de los empleados que hayan sido los representantes de ventas de algún cliente que haya realizado la compra de algún producto de la gama frutales
 `http://localhost:5184/api/oficina/OficinasSinRepresentantesVenta`
@@ -92,6 +95,7 @@
     return dato;
     }
 ```
+**Se traen los datos de Oficina, y se filtra por aquellos cuyos clientes no tengan un id de representante de venta asociado**
 
 5. las ventas totales de los producto sque hayan facturado más de 3000 euros. Se mostrará el nombre, unidades vendidas, total falcurado y total facturado con impuestos (21% IVA)
 `http://localhost:5184/api/producto/TotalConIva`
@@ -116,6 +120,7 @@
         return dato;
     }
 ```
+**De la tabla DetallePedido se hace un JOIN para traer los productos que correspondan, y se filtra por el precio indicado. Esto se almacena en un grupo para realizar operaciones con los datos almacenados, como la suma de cantidad, total de venta, y total de venta con IVA.**
 
 6. Devuelve el nombre, apellidos, puesto y teléfono de la oficina de aquellos empleados que no sean representante de ventas de ningún cliente.
 `http://localhost:5184/api/empleado/EmpleadosNoRepresentante`
@@ -141,6 +146,7 @@
         return dato;
     }
 ```
+**Se traen los datos de Empleado, con JOIN en Clientes. posteriormente se realiza un filtro donde muestre solo los empleados que no tienen asociado un CodigoRepVentas de Cliente**
 
 7. Devuelve el nombre del producto del que se han vendido más unidades (Tenga en cuenta que tendrá que calcular cuál es el número total de unidades que se han vendido de cada producto a partir de los datos de la tabla detalle_pedido)
 `http://localhost:5184/api/producto/ProductoMasVendido`
@@ -164,6 +170,7 @@ public async Task<IEnumerable<object>> ProductoMasVendido()
         return result;
     }
 ```
+**De Detalle producto se traen los productos para realizar una cuenta de cada producto, y su total. Posteriormente se le indica a la consulta que los ordene y nos arroje el primer resultado (mayorventas)**
 
 8. Devuelve un listado de los 20 productos más vendidos y el número total de unidades que se han vendido de cada uno. El listado deberá estar ordenado por el número total de unidades vendidas.
 `http://localhost:5184/api/producto/VenteMasVendidos`
@@ -186,6 +193,7 @@ public async Task<IEnumerable<object>> GetC40()
         return result;
     }
 ```
+**De Detalle producto se traen los productos para realizar una cuenta de cada producto, y su total. Posteriormente se le indica a la consulta que los ordene y nos arroje los primeros 20 resultados**
 
 9. Devuelve el nombre de los clientes a los que no se les ha entregado a tiempo un pedido
 `http://localhost:5184/api/cliente/ClientesConRetraso`
@@ -206,6 +214,7 @@ public async Task<IEnumerable<object>> GetC40()
         return dato;
     }
 ```
+**De Clientes, mediante un JOIN traemos los pedidos que se asocian a los clientes y filtramos aquellos cuya fecha de entrega no ha sido cumplida como lo esperado y devolvemos solo el nombre de dicho cliente**
 
 10. Devuelve un listado de las diferentes gamas de producto que ha comprado cada cliente
 `http://localhost:5184/api/cliente/GamasDeCliente`
@@ -229,3 +238,4 @@ public async Task<IEnumerable<object>> GetC40()
         return dato;
     }
 ```
+**Traemos todos los pedidos en la tabla DetallePedido, y mediante JOIN se trae el Producto asociado, el pedido asociado, y el cliente asociado. Para posteriormente almacenar estos datos en un grupo y listar las gamas que el resúmen de las gamas que el cliente ha comprado**
