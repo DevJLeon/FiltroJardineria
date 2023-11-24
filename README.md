@@ -100,22 +100,18 @@
     public async Task<IEnumerable<object>> TotalConIva()
     {
         var dato = await (
-            from detallePedido in _context.DetallePedidos
-            join producto in _context.Productos on detallePedido.CodigoProducto equals producto.CodigoProducto
-            let totalFacturado = detallePedido.PrecioUnidad * detallePedido.Cantidad
-            let totalConIVA = totalFacturado * 1.21M
-            group new { detallePedido, producto } by new { producto.Nombre } into grp
-            let totalVenta = grp.Sum(x => x.detallePedido.Cantidad)
-            let totalFacturadoProductos = grp.Sum(x => x.detallePedido.PrecioUnidad * x.detallePedido.Cantidad)
-            where totalFacturadoProductos > 3000
+            from dp in _context.DetallePedidos
+            join produ in _context.Productos on dp.CodigoProducto equals produ.CodigoProducto
+            where dp.PrecioUnidad * dp.Cantidad > 3000
+            group new { dp, produ } by new { produ.Nombre } into grupo
             select new
             {
-                NombreProducto = grp.Key.Nombre,
-                TotalFacturado = totalFacturadoProductos,
-                UnidadesTotales = totalVenta,
-                TotalFacturadoConIVA = totalFacturadoProductos * 1.21M
-            }
-        ).ToListAsync();
+                NombreProducto = grupo.Key.Nombre,
+                UnidadesVendidas = grupo.Sum(x => x.dp.Cantidad),
+                TotalFacturado = Math.Round(grupo.Sum(x => x.dp.PrecioUnidad * x.dp.Cantidad), 2),
+                TotalFacturadoConIVA = Math.Round(grupo.Sum(x => (decimal)(x.dp.PrecioUnidad * x.dp.Cantidad) * 1.21m), 2) //Ajusta los decimales a 2 depues del punto.
+            })
+            .ToListAsync();
 
         return dato;
     }
@@ -150,39 +146,44 @@
 `http://localhost:5184/api/producto/ProductoMasVendido`
 
 ```
-    public async Task<object> ProductoMasVendido()
+public async Task<IEnumerable<object>> ProductoMasVendido()
     {
-        var dato = await (
+        var result = await (
             from dp in _context.DetallePedidos
-            group dp by dp.CodigoProducto into grp
-            orderby grp.Sum(p => p.Cantidad) descending
-            join p in _context.Productos on grp.Key equals p.CodigoProducto
-            select p.Nombre
-        ).FirstOrDefaultAsync();
-
-        return dato;
+            join p in _context.Productos on dp.CodigoProducto equals p.CodigoProducto
+            group dp by new { dp.CodigoProducto, p.Nombre } into g
+            select new
+            {
+                IdProducto = g.Key.Nombre,
+                TotalUnidadesVendidas = g.Sum(dp => dp.Cantidad)
+            }
+        )
+        .OrderByDescending(p => p.TotalUnidadesVendidas)
+        .Take(1)
+        .ToListAsync();
+        return result;
     }
 ```
 
 8. Devuelve un listado de los 20 productos más vendidos y el número total de unidades que se han vendido de cada uno. El listado deberá estar ordenado por el número total de unidades vendidas.
 `http://localhost:5184/api/producto/VenteMasVendidos`
 ```
-    public async Task<IEnumerable<object>> VenteMasVendidos()
+public async Task<IEnumerable<object>> GetC40()
     {
-        var data = await (
-            from detallePedido in _context.DetallePedidos
-            group detallePedido by detallePedido.CodigoProducto into grp
-            join producto in _context.Productos on grp.Key equals producto.CodigoProducto
-            orderby grp.Sum(dp => dp.Cantidad) descending
+        var result = await (
+            from dp in _context.DetallesPedidos
+            join p in _context.Productos on dp.IdProducto equals p.Id
+            group dp by new { dp.IdProducto, p.Nombre } into g
             select new
             {
-                NombreProducto = producto.Nombre,
-                Codigo = grp.Key,
-                TotalUnidadesVendidas = grp.Sum(dp => dp.Cantidad)
+                IdProducto = g.Key.Nombre,
+                TotalUnidadesVendidas = g.Sum(dp => dp.Cantidad)
             }
-        ).Take(20).ToListAsync();
-    
-        return data;
+        )
+        .OrderByDescending(p => p.TotalUnidadesVendidas)
+        .Take(20)
+        .ToListAsync();
+        return result;
     }
 ```
 
